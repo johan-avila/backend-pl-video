@@ -1,0 +1,41 @@
+{
+  "name": "backend-pl-video",
+  "version": "1.0.0",
+  "description": "Backend del Platzi video",
+  "main": "index.js",
+  "scripts": {
+    "dev": "DEBUGG=app:* nodemon index.js",
+    "start": "NODE_ENV=production node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/johan-avila/backend-pl-video.git"
+  },
+  "author": "johan-avila@outlook.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/johan-avila/backend-pl-video/issues"
+  },
+  "homepage": "https://github.com/johan-avila/backend-pl-video#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "eslint": "^7.9.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "husky": "^4.3.0",
+    "lint-staged": "^10.4.0",
+    "nodemon": "^2.0.4",
+    "prettier": "^2.1.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.js": "eslint --cache --fix"
+  }
+}

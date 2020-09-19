@@ -1,3 +1,7 @@
+## MOCK DATA ###
+MOCK_DATA.json
+### vscode ###
+.vscode
 ### dotenv ###
 .env
 

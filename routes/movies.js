@@ -1,15 +1,18 @@
 const express = require("express");
-const { moviesMock } = require("../utils/mockes/movies");
+const MoviesService = require("../services/movies.js");
 
 function moviesApi(app) {
     //Exportar y pasar el APP de Express como parametro
     const router = express.Router(); //Enrutador de Express
     app.use("/api/movies", router); //Crearemos la ruta primer ruta
 
+    const moviesService = new MoviesService();
+
     //***Get All Movies***
     router.get("/", async (req, res, next) => {
+        const { tags } = req.query;
         try {
-            const movies = await Promise.resolve(moviesMock); /* ESTO INTERACTUARA CON LA DB */
+            const movies = await moviesService.getMovies({ tags });
 
             res.status(200).json({
                 data: movies, //En la "data" viene de la Base de Datos, o en su defecto un simple mock
@@ -21,8 +24,9 @@ function moviesApi(app) {
     });
     //***Get One Movie***
     router.get("/:movieId", async (req, res, next) => {
+        const { movieId } = req.params;
         try {
-            const movies = await Promise.resolve(moviesMock[0]); /* ESTO INTERACTUARA CON LA DB */
+            const movies = await moviesService.getMovie({ movieId });
 
             res.status(200).json({
                 data: movies, //En la "data" viene de la Base de Datos, o en su defecto un simple mock
@@ -34,9 +38,9 @@ function moviesApi(app) {
     });
     // ***How Create Movie
     router.post("/", async (req, res, next) => {
+        const { body:movie } = req;
         try {
-            const movieCreatedId = await Promise.resolve(moviesMock[0].id); /* ESTO INTERACTUARA CON LA DB */
-
+            const movieCreatedId = await moviesService.createMovie({movie   })
             res.status(201).json({
                 data: movieCreatedId, //En la "data" viene de la Base de Datos, o en su defecto un simple mock
                 message: "movie created"
@@ -47,8 +51,12 @@ function moviesApi(app) {
     });
     //***Update ONE movie***
     router.put("/:movieId", async (req, res, next) => {
+        const {movieId}= req.params
+        const {body: movie} = req.body
+
         try {
-            const updatedMovieId = await Promise.resolve(moviesMock[0].id); /* ESTO INTERACTUARA CON LA DB */
+
+            const updatedMovieId = await moviesService.updateMovie({movieId, movie})
 
             res.status(200).json({
                 data: updatedMovieId, //En la "data" viene de la Base de Datos, o en su defecto un simple mock
@@ -60,9 +68,9 @@ function moviesApi(app) {
     });
     //***Delete ONE Movie***
     router.delete("/:movieId", async (req, res, next) => {
+        const {movieId}= req.params
         try {
-            const deleteMovieId = await Promise.resolve(moviesMock[0].id); /* ESTO INTERACTUARA CON LA DB */
-
+            const deleteMovieId = await moviesService.deleteMovie({movieId})
             res.status(200).json({
                 data: deleteMovieId, //En la "data" viene de la Base de Datos, o en su defecto un simple mock
                 message: "movie deleted"

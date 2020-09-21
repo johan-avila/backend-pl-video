@@ -13,7 +13,6 @@ function moviesApi(app) {
         const { tags } = req.query;
         try {
             const movies = await moviesService.getMovies({ tags });
-
             res.status(200).json({
                 data: movies, //En la "data" viene de la Base de Datos, o en su defecto un simple mock
                 message: "movies listed"
@@ -38,9 +37,9 @@ function moviesApi(app) {
     });
     // ***How Create Movie
     router.post("/", async (req, res, next) => {
-        const { body:movie } = req;
+        const { body: movie } = req;
         try {
-            const movieCreatedId = await moviesService.createMovie({movie   })
+            const movieCreatedId = await moviesService.createMovie({ movie });
             res.status(201).json({
                 data: movieCreatedId, //En la "data" viene de la Base de Datos, o en su defecto un simple mock
                 message: "movie created"
@@ -51,12 +50,14 @@ function moviesApi(app) {
     });
     //***Update ONE movie***
     router.put("/:movieId", async (req, res, next) => {
-        const {movieId}= req.params
-        const {body: movie} = req.body
+        const { movieId } = req.params;
+        const { body: movie } = req;
 
         try {
-
-            const updatedMovieId = await moviesService.updateMovie({movieId, movie})
+            const updatedMovieId = await moviesService.updateMovie({
+                movieId,
+                movie
+            });
 
             res.status(200).json({
                 data: updatedMovieId, //En la "data" viene de la Base de Datos, o en su defecto un simple mock
@@ -68,9 +69,9 @@ function moviesApi(app) {
     });
     //***Delete ONE Movie***
     router.delete("/:movieId", async (req, res, next) => {
-        const {movieId}= req.params
+        const { movieId } = req.params;
         try {
-            const deleteMovieId = await moviesService.deleteMovie({movieId})
+            const deleteMovieId = await moviesService.deleteMovie({ movieId });
             res.status(200).json({
                 data: deleteMovieId, //En la "data" viene de la Base de Datos, o en su defecto un simple mock
                 message: "movie deleted"

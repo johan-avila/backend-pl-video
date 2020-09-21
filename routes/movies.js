@@ -1,6 +1,14 @@
 const express = require("express");
 const MoviesService = require("../services/movies.js");
+/* const {
+    movieIdSchema,
+    createMovieSchema,
+    updateMovieSchema
+} = require("../utils/schema/movie");
+const validationHandlers = require("../utils/middlewares/validationHandler")
+ */
 
+//*******LOGICA*******
 function moviesApi(app) {
     //Exportar y pasar el APP de Express como parametro
     const router = express.Router(); //Enrutador de Express
@@ -13,6 +21,7 @@ function moviesApi(app) {
         const { tags } = req.query;
         try {
             const movies = await moviesService.getMovies({ tags });
+
             res.status(200).json({
                 data: movies, //En la "data" viene de la Base de Datos, o en su defecto un simple mock
                 message: "movies listed"
@@ -26,7 +35,6 @@ function moviesApi(app) {
         const { movieId } = req.params;
         try {
             const movies = await moviesService.getMovie({ movieId });
-
             res.status(200).json({
                 data: movies, //En la "data" viene de la Base de Datos, o en su defecto un simple mock
                 message: "movie retrieved"

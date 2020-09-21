@@ -1,14 +1,16 @@
 const express = require("express");
 const MoviesService = require("../services/movies.js");
-/* const {
+
+const {
     movieIdSchema,
     createMovieSchema,
     updateMovieSchema
 } = require("../utils/schema/movie");
-const validationHandlers = require("../utils/middlewares/validationHandler")
- */
+
+const validationHandler = require("../utils/middlewares/validationHandler");
 
 //*******LOGICA*******
+
 function moviesApi(app) {
     //Exportar y pasar el APP de Express como parametro
     const router = express.Router(); //Enrutador de Express
@@ -31,52 +33,70 @@ function moviesApi(app) {
         }
     });
     //***Get One Movie***
-    router.get("/:movieId", async (req, res, next) => {
-        const { movieId } = req.params;
-        try {
-            const movies = await moviesService.getMovie({ movieId });
-            res.status(200).json({
-                data: movies, //En la "data" viene de la Base de Datos, o en su defecto un simple mock
-                message: "movie retrieved"
-            });
-        } catch (error) {
-            next(error);
+    //validationHandlers(schema, check= "params" || "body" || "query" || "etc" )
+    // validationHandlers({movieId: movieIdSchema}, "params" )
+    router.get(
+        "/:movieId",
+        validationHandler({ movieId: movieIdSchema }, "params"),
+        async (req, res, next) => {
+            const { movieId } = req.params;
+            try {
+                const movies = await moviesService.getMovie({ movieId });
+                res.status(200).json({
+                    data: movies, //En la "data" viene de la Base de Datos, o en su defecto un simple mock
+                    message: "movie retrieved"
+                });
+            } catch (error) {
+                next(error);
+            }
         }
-    });
+    );
     // ***How Create Movie
-    router.post("/", async (req, res, next) => {
-        const { body: movie } = req;
-        try {
-            const movieCreatedId = await moviesService.createMovie({ movie });
-            res.status(201).json({
-                data: movieCreatedId, //En la "data" viene de la Base de Datos, o en su defecto un simple mock
-                message: "movie created"
-            });
-        } catch (error) {
-            next(error);
+    // router.post("/", PODEMOS PONER VARIOS MIDDLEWARES ENTRE LOS DOS PARAMETROS, async (req, res, next) => {
+    router.post(
+        "/",
+        validationHandler(createMovieSchema),
+        async (req, res, next) => {
+            const { body: movie } = req;
+            try {
+                const movieCreatedId = await moviesService.createMovie({
+                    movie
+                });
+                res.status(201).json({
+                    data: movieCreatedId, //En la "data" viene de la Base de Datos, o en su defecto un simple mock
+                    message: "movie created"
+                });
+            } catch (error) {
+                next(error);
+            }
         }
-    });
+    );
     //***Update ONE movie***
-    router.put("/:movieId", async (req, res, next) => {
-        const { movieId } = req.params;
-        const { body: movie } = req;
+    router.put(
+        "/:movieId",
+        validationHandler({ movieId: movieIdSchema }, "params"),
+        validationHandler(updateMovieSchema),
+        async (req, res, next) => {
+            const { movieId } = req.params;
+            const { body: movie } = req;
 
-        try {
-            const updatedMovieId = await moviesService.updateMovie({
-                movieId,
-                movie
-            });
+            try {
+                const updatedMovieId = await moviesService.updateMovie({
+                    movieId,
+                    movie
+                });
 
-            res.status(200).json({
-                data: updatedMovieId, //En la "data" viene de la Base de Datos, o en su defecto un simple mock
-                message: "movie updated"
-            });
-        } catch (error) {
-            next(error);
+                res.status(200).json({
+                    data: updatedMovieId, //En la "data" viene de la Base de Datos, o en su defecto un simple mock
+                    message: "movie updated"
+                });
+            } catch (error) {
+                next(error);
+            }
         }
-    });
+    );
     //***Delete ONE Movie***
-    router.delete("/:movieId", async (req, res, next) => {
+    router.delete("/:movieId", validationHandler({ movieId: movieIdSchema }, "params"), async (req, res, next) => {
         const { movieId } = req.params;
         try {
             const deleteMovieId = await moviesService.deleteMovie({ movieId });

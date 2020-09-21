@@ -3,7 +3,7 @@ const joi = require("@hapi/joi")
 
 //Funcion que valida que haga match con el SCHEMA
 function validate(data, schema) {
-    const {error}= joi.validate(data, schema)
+    const {error}= new joi.ValidationError(data, schema)
     return error
 }
 //Manejador de la validacion

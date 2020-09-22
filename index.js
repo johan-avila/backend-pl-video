@@ -4,10 +4,12 @@ const app = express();
 const { config } = require("./config/index");
 
 const moviesApi = require("./routes/movies.js");
-
+//req.middlewares
 const {errorHandler, logError, wrapErrors} = require("./utils/middlewares/errorHandler")
 
 const notFoundHandler = require("./utils/middlewares/notFound")
+
+
 //Middlewares
 /* BodyParser */
 app.use(express.json());

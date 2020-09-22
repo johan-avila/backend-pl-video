@@ -9,6 +9,11 @@ const {
 
 const validationHandler = require("../utils/middlewares/validationHandler");
 
+const cacheResponse = require("../utils/cacheRespond");
+const {
+    FIVE_MINUTES_IN_SECONDS,
+    SIXTY_MINUTES_IN_SECONDS
+} = require("../utils/time");
 //*******LOGICA*******
 
 function moviesApi(app) {
@@ -20,6 +25,7 @@ function moviesApi(app) {
 
     //***Get All Movies***
     router.get("/", async (req, res, next) => {
+        cacheResponse(res, FIVE_MINUTES_IN_SECONDS)
         const { tags } = req.query;
         try {
             const movies = await moviesService.getMovies({ tags });
@@ -39,6 +45,7 @@ function moviesApi(app) {
         "/:movieId",
         validationHandler({ movieId: movieIdSchema }, "params"),
         async (req, res, next) => {
+            cacheResponse(res, SIXTY_MINUTES_IN_SECONDS)
             const { movieId } = req.params;
             try {
                 const movies = await moviesService.getMovie({ movieId });
@@ -96,18 +103,24 @@ function moviesApi(app) {
         }
     );
     //***Delete ONE Movie***
-    router.delete("/:movieId", validationHandler({ movieId: movieIdSchema }, "params"), async (req, res, next) => {
-        const { movieId } = req.params;
-        try {
-            const deleteMovieId = await moviesService.deleteMovie({ movieId });
-            res.status(200).json({
-                data: deleteMovieId, //En la "data" viene de la Base de Datos, o en su defecto un simple mock
-                message: "movie deleted"
-            });
-        } catch (error) {
-            next(error);
+    router.delete(
+        "/:movieId",
+        validationHandler({ movieId: movieIdSchema }, "params"),
+        async (req, res, next) => {
+            const { movieId } = req.params;
+            try {
+                const deleteMovieId = await moviesService.deleteMovie({
+                    movieId
+                });
+                res.status(200).json({
+                    data: deleteMovieId, //En la "data" viene de la Base de Datos, o en su defecto un simple mock
+                    message: "movie deleted"
+                });
+            } catch (error) {
+                next(error);
+            }
         }
-    });
+    );
 }
 
 module.exports = moviesApi;

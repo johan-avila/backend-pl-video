@@ -7,4 +7,4 @@ function cacheResponse (res, seconds){
 }
 
 
-module.exports = cacheResponse
+module.exports = cacheResponse  

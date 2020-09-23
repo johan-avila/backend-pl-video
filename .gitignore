@@ -196,3 +196,5 @@ $RECYCLE.BIN/
 # Uncomment the following lines if you're not using Zero-Installs:
 # .yarn/cache
 # .pnp.*
+
+.vercel

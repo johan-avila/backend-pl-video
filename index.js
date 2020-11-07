@@ -4,6 +4,7 @@ const app = express();
 const { config } = require("./config/index");
 
 const moviesApi = require("./routes/movies.js");
+const userMoviesApi = require("./routes/userMovie")
 //req.middlewares
 const {errorHandler, logError, wrapErrors} = require("./utils/middlewares/errorHandler")
 
@@ -16,6 +17,7 @@ app.use(express.json());
 
 //API routes *Las rutas tambien son middlewares*
 moviesApi(app);
+userMoviesApi(app)
 //Catch 404
 app.use(notFoundHandler)
 /* Handler Errors */

@@ -1,7 +1,9 @@
 const express = require("express");
+const passport = require("passport");
 
 const UserMoviesService = require("../services/userMovies");
 const validationHandler = require("../utils/middlewares/validationHandler");
+const scopesValidationHandler = require("../utils/middlewares/scopesValidationHandler");
 
 const { movieIdSchema } = require("../utils/schema/movie");
 const { userIdSchema } = require("../utils/schema/users");
@@ -12,9 +14,12 @@ function userMoviesApi(app) {
     app.use("/api/user-movies", router);
 
     const userMoviesService = new UserMoviesService();
-
+    /*Estrategia de passport.js */
+    require("../utils/auth/strategies/jwt");
     router.get(
         "/",
+        passport.authenticate("jwt", { session: false }),
+        scopesValidationHandler(["read:user-movies"]),
         validationHandler({ userId: userIdSchema }, "query"),
 
         async (req, res, next) => {
@@ -34,10 +39,12 @@ function userMoviesApi(app) {
     );
     router.post(
         "/",
+        passport.authenticate("jwt", { session: false }),
+        scopesValidationHandler(["create:user-movies"]),
         validationHandler(createUserMovieSchema),
         async (req, res, next) => {
-            const {  body: userMovie } = req;
-            console.log(userMovie);    
+            const { body: userMovie } = req;
+            console.log(userMovie);
             try {
                 const createUserMovieId = await userMoviesService.createUserMovies(
                     { userMovie }
@@ -53,6 +60,8 @@ function userMoviesApi(app) {
     );
     router.delete(
         "/:userMovieId",
+        passport.authenticate("jwt", { session: false }),
+        scopesValidationHandler(["delete:user-movies"]),
         validationHandler({ userMovieId: movieIdSchema }, "params"),
         async (req, res, next) => {
             const { userMovieId } = req.params;
@@ -73,3 +82,4 @@ function userMoviesApi(app) {
 }
 
 module.exports = userMoviesApi;
+  

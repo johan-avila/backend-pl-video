@@ -8,7 +8,8 @@ class UserService {
     }
 
     async getUsers({ email }) {
-        const [user] = this.mongoDB.getAll(this.collection, { email });
+        const [user] = await this.mongoDB.getAll(this.collection, { email });
+        
         return user
     }
     async createUser({user}) {
@@ -20,7 +21,7 @@ class UserService {
         const creteUserId = await this.mongoDB.createOne(this.collection, {
             name,
             email,
-            password: hashedPassword
+            password: hashedPassword,
         }) 
         return creteUserId
     }

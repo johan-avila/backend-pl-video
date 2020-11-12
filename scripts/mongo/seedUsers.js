@@ -37,4 +37,4 @@ async function createUser(user) {
   return userId;
 }
 
-console.log(createUser(users[2]));
+console.log(createUser(users[2  ]));

@@ -4,7 +4,7 @@
   "description": "Backend del Platzi video",
   "main": "index.js",
   "scripts": {
-    "dev": "DEBUGG=app:* nodemon index.js",
+    "dev": "nodemon index.js",
     "start": "NODE_ENV=production node index.js",
     "test": "mocha --exit",
     "cover": "nyc npm run test",

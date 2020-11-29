@@ -1,7 +1,7 @@
 const assert = require("assert");
 const proxyquire = require("proxyquire");
 
-const { moviesMock, MoviesServiceMock } = require("../utils/mockes/movies.js");
+const { moviesMock, MoviesServiceMock } = require("../utils/mocks/movies.js");
 
 const testServer = require("../utils/testServer");
 

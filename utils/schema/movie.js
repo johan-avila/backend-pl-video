@@ -15,11 +15,9 @@ const createMovieSchema = joi.object({
     synopsis: movieSynopsisSchema.required(),
     img_url: movieImgUrlSchema.required(),
     year: movieYearSchema.required(),
-        
     contentRating: movieContentRatingSchema.required(),
     source: movieSourceSchema.required(),
     tags: movieTagsSchema,
-    
     duration: movieDurationSchema.required(),
 });
 
@@ -28,11 +26,9 @@ const updateMovieSchema = {
     synopsis: movieSynopsisSchema,
     img_url: movieImgUrlSchema,
     year: movieYearSchema,
-    
     contentRating: movieContentRatingSchema,
     source: movieSourceSchema,
     tags: movieTagsSchema,
-    
     duration: movieDurationSchema,
 };
 

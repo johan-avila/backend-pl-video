@@ -1,24 +1,20 @@
-const boom = require("@hapi/boom");
+const boom = require("@hapi/boom")
 
-function scopesValidationHandler(allowedScopes) {
-    return function (req, res, next) {
-
-        if (!req.user || (req.user && !req.user.scopes)) {
-            next(boom.unauthorized());
+let scopesValidationHandler = (allowScopes) => {
+    return function(req, res, next){
+        console.log("__req.user__",req.user);
+        if(!req.user || req.user && !req.user.scopes ){
+            boom.unauthorized("Missing scopes 🌵")
         }
-        const hasAcces = allowedScopes
-            .map((allowedScope) => {
-                
-                return req.user.scopes.includes(allowedScope);
-            })
-            .find((allowed) => Boolean(allowed));
-    
+        const hasAcces = allowScopes
+            .map(allowScopes => req.user.scopes.includes(allowScopes))
+            .find(allowed =>  Boolean(allowed))
         if(hasAcces){
             next()
-        }else{
-            next(boom.unauthorized("Insufficient scoopes"))
+        } else {
+            next(boom.unauthorized("Insufficient scopes 🍄"))
         }
-    };
+    }
 }
 
 module.exports = scopesValidationHandler

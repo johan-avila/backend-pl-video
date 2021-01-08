@@ -1,14 +1,14 @@
-const MongoLib = require("../lib/mongodb")
+const MongoLib = require("../lib/mongodb");
 
 class ApiKeysService {
-    constructor (){
-        this.collection = "api-keys"
-        this.mongoDB= new MongoLib()
-    }
-    async getApiKey({token}){
-        const [apikey] = await this.mongoDB.getAll(this.collection, { token })
-        
-        return apikey
+    constructor() {
+        this.collection = "api-keys";
+        this.mongoDB = new MongoLib();
+    }   
+    async getApiKey({ token }) {
+        const [ apikey ] = await this.mongoDB.getAll(this.collection, { token });
+
+        return apikey;
     }
 }
 

@@ -1,87 +1,129 @@
 const express = require("express");
 const passport = require("passport");
-const boom = require("@hapi/boom");
-const jwt = require("jsonwebtoken");
-const ApiKeysService = require("../services/apiKeys");
+const boom = require("@hapi/boom")
+const jwt = require("jsonwebtoken")
+
+const ApiKeysService = require("../services/apiKeys")
 const UserService = require("../services/users");
-const validationHandler = require("../utils/middlewares/validationHandler");
+const { config } = require("../config");
 
-const { createUserSchema } = require("../utils/schema/users");
+//Basic Strategy
+require("../utils/auth/strategies/basic")
 
-const { config } = require("../config/index");
-//Basic strategy
-require("../utils/auth/strategies/basic");
-
-function AuthApi(app) {
+function authApi (app) {
     const router = express.Router();
-    app.use("/api/auth", router);
-    //Services
-    const apiKeysService = new ApiKeysService();
-    const userService = new UserService();
-    //Services
-    router.post("/sign-in", async (req, res, next) => {
-        const { apiToken } = req.body;
+    app.use("/api/auth", router)
+    
+    const apiKeysService = new ApiKeysService()
+    const usersService = new UserService()
 
-        if (!apiToken) {
-            next(boom.unauthorized("Api token is required"));
+
+    router.post("/sign-in", (req, res, next)=>{
+        //  this key is required and isnt diferent by public client and Admin client
+        const { apiKeyToken } = req.body 
+        
+        if (!apiKeyToken) {
+            return next(boom.unauthorized("ApiKeyToken is required👀"))
         }
-        passport.authenticate("basic", async (err, user) => {
+        //Use passport for autenticate
+        passport.authenticate("basic", (err, user)=>{
             try {
                 if (err || !user) {
-                    next(boom.unauthorized());
+                    return next(boom.unauthorized())
                 }
-
-                //Esto es para no manejar un estado de sesion, es error de seguridad
-                req.login(user, { session: false }, async (error) => {
-                    if (error) {
-                        next(error);
+                
+                req.login(user, {session: false}, async(err)=>{
+                    if (err){
+                        return next(err)
                     }
-                    const apikey = await apiKeysService.getApiKey({
-                        token: apiToken
-                    });
+                    const apikey = await apiKeysService.getApiKey({token: apiKeyToken })
                     if (!apikey) {
-                        next(boom.unauthorized());
+                        return next(boom.unauthorized())
                     }
-
-                    const { _id: id, name, email } = user;
+                    
+                    const {  _id , name, email} = user;
                     const payload = {
-                        sub: id,
+                        sub:_id,
                         name,
-                        email,
-                        scope: apikey.scopes
-                    };
+                        email, 
+                        scopes: apikey.scopes
+                    }
 
                     const token = jwt.sign(payload, config.auth_jwt_secret, {
-                        expiresIn: "15m"
-                    });
-                    return res
-                        .status(200)
-                        .json({ token, user: { id, name, email } });
-                });
-            } catch (err) {
-                next(err);
-            }
-        })(req, res, next);
-    });
-    router.post(
+                        expiresIn: "600m",
 
-        "/sign-up",
-        validationHandler(createUserSchema),
-        async (req, res, next) => {
-            const { user } = req.body;
-            console.log(user);
-            try {
-                
-                const createUserId = await userService.createUser({user})
-                res.status(201).json({
-                    data: createUserId, 
-                    message: "User created"
+                    })
+                    return res.status(200).json({
+                        token,
+                        user: {
+                            id:_id,
+                            name,
+                            email
+                        }
+                    })
                 })
             } catch (error) {
-                next(error)
+                return next(error)
             }
+        })(req,res, next )
+    })
+
+    router.post("/sign-up", async (req, res, next)=>{
+        const { apiKeyToken, user } = req.body
+        if(!apiKeyToken){
+            return next(boom.unauthorized("ApiKeyToken is required"))
+        } 
+        try {
+            const cretedUser = await usersService.createUser({user})
+         
+            res.status(201).json({
+                message :"User created",
+                data : [
+                    cretedUser
+                ]
+            })
+        } catch (error) {
+            return next(error)
         }
-    );
+    })
+
+    router.post("/sign-provider", async(req, res, next)=>{
+        
+        const { apiKeyToken, user } = req.body
+        if (!apiKeyToken) {
+            next(boom.unauthorized("ApiKeyToken is required"))
+        }
+        try {
+            const queriedUser = await usersService.getOrCreateUser({user})
+            const apikey = await apiKeysService.getApiKey({token: apiKeyToken})
+            if (!apikey) {
+                return next(boom.unauthorized())
+            }
+            const { _id: id, name, email} = queriedUser
+            const payload = {
+                sub: id,
+                name,
+                email,
+                scopes: apikey.scopes
+            }
+
+            const token = jwt.sign(payload, config.auth_jwt_secret, {
+                expiresIn: "60m"
+            }) 
+
+            return res.status(200).json({
+                token,
+                user: {
+                    id,
+                    name,
+                    email
+                }
+            })
+        } catch (error) {
+            next(error)
+        }
+        
+    })
 }
 
-module.exports = AuthApi;
+module.exports = authApi;

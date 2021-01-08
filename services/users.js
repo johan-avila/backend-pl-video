@@ -25,6 +25,15 @@ class UserService {
         }) 
         return creteUserId
     }
+    async getOrCreateUser({user}){
+        
+        const queriedUser = await this.getUsers({email: user.email})
+        if (queriedUser) {
+            return queriedUser
+        }
+        await this.createUser({user})
+        return await this.getUsers({ email: user.email })
+    }
 }
 
 

@@ -36,7 +36,9 @@ function authApi (app) {
                     if (err){
                         return next(err)
                     }
+                    
                     const apikey = await apiKeysService.getApiKey({token: apiKeyToken })
+                    
                     if (!apikey) {
                         return next(boom.unauthorized())
                     }
